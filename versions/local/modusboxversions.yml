@@ -1,7 +1,5 @@
 v_interop_docker: latest
-v_interop_domain: 0.1.38
-v_interop_scheme_adapter: 1.0.13
-v_interop_dfsp_directory: 0.4.32
-v_interop_ilp_ledger: 0.1.6
-v_interop_mock_central_directory: 1.0.0
+v_dfsp_scheme_adapter: 0.3-SNAPSHOT
+v_interop_switch: 0.5-SNAPSHOT
+v_interop_connector: 0.4-SNAPSHOT
 v_realtime_demo: 1.0.0
