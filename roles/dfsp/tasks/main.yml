@@ -1,6 +1,8 @@
 ---
-    - include_vars:
-        file: versions/{{ env }}/dfspversions.yml
+    - include_vars: "{{ item }}"
+      with_items:
+        - versions/{{ env }}/switchversions.yml
+        - versions/{{ env }}/modusboxversions.yml
 
     - name: start postgres
       become: true
@@ -123,8 +125,8 @@
           ut_dfsp_api_dev_transfer__url: 'http://dfsp-transfer:8018'
           ut_dfsp_api_dev_ist__key: '{{ inventory_hostname }}'
           ut_dfsp_api_dev_ist__secret: '{{ inventory_hostname }}'
-          ut_dfsp_api_dev_ist__url: 'http://{{ api_hostname }}:8088/directory/v1'
-          ut_dfsp_api_dev_spsp__url: 'http://{{ api_hostname }}:8088/scheme/adapter/v1'
+          ut_dfsp_api_dev_ist__url: 'http://{{ worker_host }}:8088/directory/v1'
+          ut_dfsp_api_dev_spsp__url: 'http://{{ worker_host }}:8088/scheme/adapter/v1'
         networks:
           - name: MOJALOOP_NET
         log_driver: syslog
@@ -300,3 +302,33 @@
         ports: 
           - 30009:30009
           - 8009:8009
+
+    - name: Start dfsp-scheme-adapter
+      become: true
+      docker_container:
+        name: dfsp-scheme-adapter
+        image: 'mojaloop/dfsp-scheme-adapter:{{ v_dfsp_scheme_adapter }}'
+        restart_policy: always
+        state: started
+        networks:
+          - name: MOJALOOP_NET
+        restart: yes
+        log_driver: syslog
+        log_options:
+          syslog-address: 'tcp://{{ log_ip }}:514'
+          syslog-facility: daemon
+          tag: dfsp-scheme-adapter
+        ports:
+          - '8088:8088'
+          - '8443:443'
+        env:
+          MOJALOOP_HOST: '{{ switch_host }}'
+          MOJALOOP_PORT: '8088'
+          DFSP_HOST: '{{ worker_host }}'
+          DFSP_API_PORT: '8010'
+          DFSP_LEDGER_PORT: '8014'
+          MAX_JVM_MEMORY: '256'
+          DFSP_SCHEME_ADAPTER_HOST: '0.0.0.0'
+          DFSP_SCHEME_ADAPTER_PORT: '8088'
+          DFSP_SCHEME_ADAPTER_HTTPS_PORT: '443'
+          DFSP_ENVIRONMENT: '{{ inventory_hostname }}-test'

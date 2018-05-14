@@ -70,7 +70,7 @@
   roles:
     - role: login_docker
 
-- name: Install Central SWITCH components
+- name: Install Mojaloop SWITCH components
   hosts: switches
   tags: switch
   roles:
@@ -89,26 +89,28 @@
 #  roles:
 #    - role: mule_non_docker_pre_switch
 
-- name: Install SWITCH ModusBox components
-  hosts: switches
-  tags: mule_switch
-  become: yes
-  roles:
-#    - role: mule_non_docker_switch
-    - role: mule_switch
-      env_path: env/{{ env }}
-      log_ip: 172.17.0.1
-      worker_host: '{{ hostvars[inventory_hostname].ec2_facts.public_dns_name }}'
-      mgmt_host: '{{ hostvars.mgmt1.ec2_facts.public_dns_name }}'
+#- name: Install SWITCH ModusBox components
+#  hosts: switches
+#  tags: mule_switch
+#  become: yes
+#  roles:
+##    - role: mule_non_docker_switch
+#    - role: mule_switch
+#      env_path: env/{{ env }}
+#      log_ip: 172.17.0.1
+#      worker_host: '{{ hostvars[inventory_hostname].ec2_facts.public_dns_name }}'
+#      mgmt_host: '{{ hostvars.mgmt1.ec2_facts.public_dns_name }}'
 
-- name:  Install DFSP components
+- name:  Install Mojaloop DFSP components
   hosts: dfsps
   tags: dfsp
   roles:
     - role: dfsp
       env_path: env/{{ env }}
       log_ip: 172.17.0.1
-      api_hostname: '{{ hostvars[inventory_hostname].ec2_facts.public_dns_name }}'
+      worker_host: '{{ hostvars[inventory_hostname].ec2_facts.public_dns_name }}'
+      mgmt_host: '{{ hostvars.mgmt1.ec2_facts.public_dns_name }}'
+      switch_host: '{{ hostvars.switch1.ec2_facts.public_dns_name }}'
 
 #- name: Pull ModusBox components
 #  hosts: localhost
@@ -117,18 +119,18 @@
 #  roles:
 #    - role: mule_non_docker_pre
 
-- name: Install ModusBox components
-  hosts: dfsps
-  tags: mule
-  become: yes
-  roles:
-    - role: mule
-#    - role: mule_non_docker
-      env_path: env/{{ env }}
-      log_ip: 172.17.0.1
-      worker_host: '{{ hostvars[inventory_hostname].ec2_facts.public_dns_name }}'
-      mgmt_host: '{{ hostvars.mgmt1.ec2_facts.public_dns_name }}'
-      switch_host: '{{ hostvars.switch1.ec2_facts.public_dns_name }}'
+#- name: Install ModusBox components
+#  hosts: dfsps
+#  tags: mule
+#  become: yes
+#  roles:
+#    - role: mule
+##    - role: mule_non_docker
+#      env_path: env/{{ env }}
+#      log_ip: 172.17.0.1
+#      worker_host: '{{ hostvars[inventory_hostname].ec2_facts.public_dns_name }}'
+#      mgmt_host: '{{ hostvars.mgmt1.ec2_facts.public_dns_name }}'
+#      switch_host: '{{ hostvars.switch1.ec2_facts.public_dns_name }}'
 
 - name:  Install Account and User Data
   hosts: mgmt

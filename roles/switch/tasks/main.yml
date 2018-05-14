@@ -1,6 +1,8 @@
 ---
-    - include_vars:
-        file: versions/{{env}}/switchversions.yml
+    - include_vars: "{{ item }}"
+      with_items:
+        - versions/{{ env }}/switchversions.yml
+        - versions/{{ env }}/modusboxversions.yml
 
     - name: Create the MOJALOOP SWITCH docker network
       become: true
@@ -258,3 +260,103 @@
           CHUB_API_URL: 'http://{{ worker_host }}:3004'
           CHUB_HOSTNAME: 'http://{{ worker_host }}:4001'
       become: true
+
+    - name: Create table participant_fsp_mapping
+      shell: PGPASSWORD=cVq8iFqaLuHy8jjKuA psql -U interop_switch -h 127.0.0.1 -p 5432 -c "CREATE TABLE participant_fsp_mapping (uuid uuid NOT NULL, type text COLLATE pg_catalog."default", id text COLLATE pg_catalog."default", sub_id text COLLATE pg_catalog."default", fsp_id text COLLATE pg_catalog."default", created_by text COLLATE pg_catalog."default", created_date timestamp with time zone DEFAULT now(), updated_by text COLLATE pg_catalog."default", updated_date timestamp with time zone DEFAULT now(), CONSTRAINT participant_fsp_mapping_pkey PRIMARY KEY (uuid)) WITH ( OIDS = FALSE) TABLESPACE pg_default;"
+      register: result
+      ignore_errors: true
+      changed_when: "'CREATE TABLE' in result.stdout"
+
+    - name: Create table fsp_details
+      shell: PGPASSWORD=cVq8iFqaLuHy8jjKuA psql -U interop_switch -h 127.0.0.1 -p 5432 -c "CREATE TABLE fsp_details (fsp_id text COLLATE pg_catalog."default" NOT NULL, callback_url text COLLATE pg_catalog."default", connector_port text COLLATE pg_catalog."default", CONSTRAINT fsp_details_pkey PRIMARY KEY (fsp_id)) WITH (OIDS = FALSE) TABLESPACE pg_default;"
+      register: result
+      ignore_errors: true
+      changed_when: "'CREATE TABLE' in result.stdout"
+
+    - name: Start interop-switch
+      become: true
+      docker_container:
+        name: interop-switch
+        image: "mojaloop/interop-switch:{{ v_interop_switch }}"
+        restart_policy: always
+        state: started
+        networks:
+          - name: MOJALOOP_NET
+        log_driver: syslog
+        log_options:
+          syslog-address: 'tcp://{{ log_ip }}:514'
+          syslog-facility: daemon
+          tag: interop-switch
+        ports:
+          - "8088:8088"
+        env:
+          SERVICE_8089_NAME: 'interop-switch'
+          MAX_JVM_MEMORY: '256'
+          SWITCH_SERVICE_HOST: '0.0.0.0'
+          SWITCH_SERVICE_PORT: '8088'
+          CENTRAL_DIR_HOST: '{{ worker_host }}'
+          CENTRAL_DIR_PORT: '3000'
+          CONNECTOR_HOST: '{{ worker_host }}'
+          PSQL_HOST: '{{ worker_host }}'
+          PSQL_PORT: '5432'
+          PSQL_DATABASE: 'interop_switch'
+          PSQL_USER: 'interop_switch'
+          PSQL_PASSWORD: '{{ interop_switch_pass }}'
+
+
+    - name: Start interop-connector(s)
+      become: true
+      docker_container:
+        name: interop-connector-{{ item.name }}
+        image: "mojaloop/interop-connector:{{ v_interop_connector }}"
+        restart_policy: always
+        state: started
+        networks:
+          - name: MOJALOOP_NET
+        log_driver: syslog
+        log_options:
+          syslog-address: 'tcp://{{ log_ip }}:514'
+          syslog-facility: daemon
+          tag: interop-connector-{{ item.name }}
+        ports:
+          - "{{ item.port }}:8088"
+        env:
+          CONNECTOR_SERVICE_HOST: '0.0.0.0'
+          CONNECTOR_SERVICE_PORT: '8088'
+          CONNECTOR_ACCOUNT: '{{ item.name }}'
+          FSP_SERVICE_HOST: '{{ item.dfsp_host }}'
+          FSP_SERVICE_PORT: '8443'
+          FSP_SERVICE_BASEPATH: '/scheme/adapter/ml-dfsp/v1'
+          CENTRAL_LEDGER_HOST: '{{ worker_host }}'
+          CENTRAL_LEDGER_PORT: '3002'
+      with_items:
+        - {name: 'dfsp1', port: '8091', dfsp_host: '{{ hostvars.dfsp1.ansible_host }}'}
+        - {name: 'dfsp2', port: '8092', dfsp_host: '{{ hostvars.dfsp2.ansible_host }}'}
+
+#    - name: Register FSP(s) with the switch
+#      uri:
+#        url: http://{{ worker_host }}:8088/interop/switch/v1/fsp
+#        method: POST
+#        body: "{{\"fspId\":\"{{ item.name }}\", \"baseUrl\":\"http://{{ item.dfsp_host }}:8443/scheme/adapter/ml-dfsp/v1\", \"connectorPort\": \"{{ item.port }}\"}}"
+#        headers:
+#          Content-Type: application/json
+#          Accept: application/json
+#      with_items:
+#        - {name: 'dfsp1', port: '8091', dfsp_host: '{{ hostvars.dfsp1.ansible_host }}'}
+#        - {name: 'dfsp2', port: '8092', dfsp_host: '{{ hostvars.dfsp2.ansible_host }}'}
+#      register: output
+#
+#    - debug:
+#        var: output.stdout
+
+    - name: Register FSP(s) with the switch
+      shell: "curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{\"fspId\":\"{{ item.name }}\", \"baseUrl\":\"http://{{ item.dfsp_host }}:8443/scheme/adapter/ml-dfsp/v1\", \"connectorPort\": \"{{ item.port }}\"}' http://{{ worker_host }}:8088/interop/switch/v1/fsp"
+      register: output
+      with_items:
+        - {name: 'dfsp1', port: '8091', dfsp_host: '{{ hostvars.dfsp1.ansible_host }}'}
+        - {name: 'dfsp2', port: '8092', dfsp_host: '{{ hostvars.dfsp2.ansible_host }}'}
+
+    - debug:
+        var: output.stdout
+
+
