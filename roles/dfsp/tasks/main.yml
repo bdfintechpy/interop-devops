@@ -1,7 +1,7 @@
 ---
     - include_vars: "{{ item }}"
       with_items:
-        - versions/{{ env }}/switchversions.yml
+        - versions/{{ env }}/dfspversions.yml
         - versions/{{ env }}/modusboxversions.yml
 
     - name: start postgres
