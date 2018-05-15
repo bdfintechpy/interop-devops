@@ -12,8 +12,8 @@ Vagrant.configure("2") do |config|
     dfsp1_config.vm.network "public_network", ip: "192.168.0.xxx", bridge: "en0: Wi-Fi (AirPort)"
     #dfsp1_config.vm.network "private_network", ip: "10.0.15.11"
     dfsp1_config.vm.provider "virtualbox" do |v|
-      v.memory = 2560
-      v.cpus = 2
+      v.memory = 1536
+      v.cpus = 1
     end
   end
 
@@ -24,8 +24,8 @@ Vagrant.configure("2") do |config|
     dfsp2_config.vm.network "public_network", ip: "192.168.0.xxx", bridge: "en0: Wi-Fi (AirPort)"
     #dfsp2_config.vm.network "private_network", ip: "10.0.15.12"
     dfsp2_config.vm.provider "virtualbox" do |v|
-      v.memory = 2560
-      v.cpus = 2
+      v.memory = 1536
+      v.cpus = 1
     end
   end
 
@@ -36,8 +36,8 @@ Vagrant.configure("2") do |config|
     switch_config.vm.network "public_network", ip: "192.168.0.xxx", bridge: "en0: Wi-Fi (AirPort)"
     #switch_config.vm.network "private_network", ip: "10.0.15.13"
     switch_config.vm.provider "virtualbox" do |v|
-      v.memory = 1536
-      v.cpus = 1
+      v.memory = 3096
+      v.cpus = 2
     end
   end
 

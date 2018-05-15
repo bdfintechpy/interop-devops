@@ -2,6 +2,14 @@
   become: true
   shell: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
+- name: add postgresql gpg key
+  become: true
+  shell: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+
+- name: add postgresql repo
+  become: true
+  shell: add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main"
+
 - name: ensure apt cache is updated
   become: true
   action: apt update_cache=yes
@@ -20,6 +28,7 @@
     - docker-ce
     - unzip
     - ntp
+    - postgresql-client-9.6
     #- openjdk-7-jre-headless
 
 - name: Install python libs
