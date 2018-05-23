@@ -1,6 +1,0 @@
-- name: Get inventory from AWS
-  hosts: localhost
-  connection: local
-  gather_facts: no
-  roles:
-    - build_inventory

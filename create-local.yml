@@ -21,11 +21,11 @@
   roles:
     - role: provision_workers
 
-- name: Create local artifacts
-  hosts: localhost
-  tags: artifacts
-  roles:
-    - role: artifacts_local
+#- name: Create local artifacts
+#  hosts: localhost
+#  tags: artifacts
+#  roles:
+#    - role: artifacts_local
 
 - name: Login to docker
   hosts: switches, dfsps
@@ -44,24 +44,6 @@
       mgmt_host: '{{ hostvars.mgmt.ansible_host }}'
       side_kms_url: ws://central-kms-test-825003705.us-west-2.elb.amazonaws.com/sidecar
 
-#- name: Pull SWITCH ModusBox components
-#  hosts: localhost
-#  tags: mule_switch
-#  become: yes
-#  roles:
-#    - role: mule_non_docker_pre_switch
-#
-#- name: Install SWITCH ModusBox components
-#  hosts: switches
-#  tags: mule_switch
-#  become: yes
-#  roles:
-#    - role: mule_non_docker_switch
-#      env_path: /vagrant/env/local
-#      log_ip: '{{ hostvars.mgmt.ansible_host }}'
-#      worker_host: '{{ hostvars.switch.ansible_host }}'
-#      mgmt_host: '{{ hostvars.mgmt.ansible_host }}'
-
 - name: Install Mojaloop DFSP components
   hosts: dfsps
   tags: dfsp
@@ -73,42 +55,12 @@
       mgmt_host: '{{ hostvars.mgmt.ansible_host }}'
       switch_host: '{{ hostvars.switch.ansible_host }}'
 
-#- name: Pull ModusBox components
-#  hosts: localhost
-#  tags: mule
-#  become: yes
-#  roles:
-#    - role: mule_non_docker_pre
-#
-#- name: Install ModusBox components
-#  hosts: dfsps
-#  tags: all_dfsp, mule
-#  become: yes
-#  roles:
-#    - role: mule_non_docker
-#      env_path: /vagrant/env/local
-#      log_ip: '{{ hostvars.mgmt.ansible_host }}'
-#      worker_host: '{{ hostvars.switch.ansible_host }}'
-#      mgmt_host: '{{ hostvars.mgmt.ansible_host }}'
-
 - name:  Install Account and User Data
   hosts: mgmt
   tags: request
   roles:
     - role: request_data
-
-#- name:  Install ILP components
-#  hosts: dfsps
-#  tags: ilp
-#  roles:
-#    - role: ilp
-#      env_path: /vagrant/env/local
-#      log_ip: '{{ hostvars.mgmt.ansible_host }}'
-#      switch_host_name: '{{ hostvars.switch.ansible_host }}'
-#      ilp_host_name: '{{ ansible_hostname }}'
-#      ilp_base_url: 'http://{{ ansible_host }}'
-#      ilp_address_neighborhood: 'levelone'
-#      ilp_central_ledger_prefix: "levelone.ist."
+      switch_host: '{{ hostvars.switch.ansible_host }}'
 
 - name:  Install ELK stack
   hosts: mgmt

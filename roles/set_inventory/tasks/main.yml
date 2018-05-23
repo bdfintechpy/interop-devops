@@ -1,3 +1,0 @@
-- shell: echo {{ inventory_hostname }} > /etc/hostname
-
-- shell: hostname {{ inventory_hostname }}
