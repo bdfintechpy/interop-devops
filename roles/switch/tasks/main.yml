@@ -93,6 +93,7 @@
           CDIR_HOSTNAME: 'http://{{ worker_host }}:3000'
           CDIR_END_USER_REGISTRY_URL: 'http://{{ worker_host }}:3001'
           CDIR_PATHFINDER__PROVISIONING__ADDRESS: 'http://{{ worker_host }}:8080/nrs-pi/services/SIPIX/SendRequest'
+          CDIR_PATHFINDER__QUERY__ADDRESS: '{{ worker_host }}'
           CDIR_DEFAULT_DFSP: 'The second DFSP'
           CDIR_ADMIN_KEY: 'admin'
           CDIR_ADMIN_SECRET: 'admin'
@@ -334,12 +335,12 @@
         - {name: 'dfsp2', port: '8092', dfsp_host: '{{ hostvars.dfsp2.ansible_host }}'}
 
     - name: Waiting to make sure connectors started
-          wait_for:
-            port: '{{ item }}'
-            delay: 10
-          with_items:
-            - 8091
-            - 8092
+      wait_for:
+        port: '{{ item }}'
+        delay: 10
+      with_items:
+        - 8091
+        - 8092
 
     - name: Register FSP(s) with the switch
       shell: "curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{\"fspId\":\"{{ item.name }}\", \"baseUrl\":\"http://{{ item.dfsp_host }}:8443/scheme/adapter/ml-dfsp/v1\", \"connectorPort\": \"{{ item.port }}\"}' http://{{ worker_host }}:8088/interop/switch/v1/fsp"
