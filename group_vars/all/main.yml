@@ -30,7 +30,7 @@ keypair: interop-dev1 # Change the keypair name
 #vpc_subnet_id: subnet-be345fc8 #us-west-2a
 #vpc_subnet_id: subnet-3963305d #us-west-2b
 #vpc_subnet_id: subnet-95b207cd #us-west-2c
-vpc_subnet_id: vpc-645c460d #eu-central-1
+vpc_subnet_id: subnet-f556b48f #eu-central-1
 name_tag: interop-switch-oss-live
 
 # Instance types:
