@@ -21,12 +21,12 @@
 #      tags: dns
   roles:
 
-    - role: provision_ec2
-      l1p_type: switch
-      inst_role: switches
-      provision_ec2_type: '{{ switch_ec2_type }}'
-      provision_ec2_count: '{{ switch_ec2_count }}'
-      tags: switch, provision
+#    - role: provision_ec2
+#      l1p_type: switch
+#      inst_role: switches
+#      provision_ec2_type: '{{ switch_ec2_type }}'
+#      provision_ec2_count: '{{ switch_ec2_count }}'
+#      tags: switch, provision
 
     - role: provision_ec2
       l1p_type: dfsp
@@ -35,12 +35,12 @@
       provision_ec2_count: '{{ dfsp_ec2_count }}'
       tags: dfsp, provision
 
-    - role: provision_ec2
-      l1p_type: mgmt
-      inst_role: mgmt
-      provision_ec2_type: '{{ mgmt_ec2_type }}'
-      provision_ec2_count: '{{ mgmt_ec2_count }}'
-      tags: mgmt, provision
+#    - role: provision_ec2
+#      l1p_type: mgmt
+#      inst_role: mgmt
+#      provision_ec2_type: '{{ mgmt_ec2_type }}'
+#      provision_ec2_count: '{{ mgmt_ec2_count }}'
+#      tags: mgmt, provision
 
     - role: build_inventory
       tags: always
@@ -51,12 +51,12 @@
     - role: artifacts_ec2
       tags: artifacts
 
-- name: Provision management node
-  hosts: mgmt
-  tags: provision2, mgmt
-  roles:
-    - { role: provision_ec2_mgmt, become: yes }
-    - { role: provision_ec2_mgmt_nr, become: no }
+#- name: Provision management node
+#  hosts: mgmt
+#  tags: provision2, mgmt
+#  roles:
+#    - { role: provision_ec2_mgmt, become: yes }
+#    - { role: provision_ec2_mgmt_nr, become: no }
 
 - name: Provision worker node(s)
   hosts: switches, dfsps
@@ -70,17 +70,17 @@
   roles:
     - role: login_docker
 
-- name: Install Mojaloop SWITCH components
-  hosts: switches
-  tags: switch
-  roles:
-    - role: switch
-      env_path: env/{{ env }}
-      log_ip: 172.17.0.1
-      postgres_ip: 172.17.0.1
-      worker_host: '{{ hostvars[inventory_hostname].ec2_facts.public_dns_name }}'
-      mgmt_host: '{{ hostvars.mgmt1.ec2_facts.public_dns_name }}'
-      side_kms_url: 'ws://central-kms-test-825003705.us-west-2.elb.amazonaws.com/sidecar'
+#- name: Install Mojaloop SWITCH components
+#  hosts: switches
+#  tags: switch
+#  roles:
+#    - role: switch
+#      env_path: env/{{ env }}
+#      log_ip: 172.17.0.1
+#      postgres_ip: 172.17.0.1
+#      worker_host: '{{ hostvars[inventory_hostname].ec2_facts.public_dns_name }}'
+#      mgmt_host: '{{ hostvars.mgmt1.ec2_facts.public_dns_name }}'
+#      side_kms_url: 'ws://central-kms-test-825003705.us-west-2.elb.amazonaws.com/sidecar'
 
 - name:  Install Mojaloop DFSP components
   hosts: dfsps
@@ -91,32 +91,32 @@
       log_ip: 172.17.0.1
       worker_host: '{{ hostvars[inventory_hostname].ec2_facts.public_dns_name }}'
       mgmt_host: '{{ hostvars.mgmt1.ec2_facts.public_dns_name }}'
-      switch_host: '{{ hostvars.switch1.ec2_facts.public_dns_name }}'
+      switch_host: '{{ remote_switch }}'
 
-- name:  Install Account and User Data
-  hosts: mgmt
-  tags: request
-  roles:
-    - role: request_data
-      switch_host: '{{ hostvars.switch1.ansible_host }}'
-
-- name:  Install ELK stack
-  hosts: mgmt
-  tags: elk
-  roles:
-    - { role: elk, become: yes, mgmt_host: '{{ hostvars.mgmt1.ec2_facts.public_dns_name }}' }
-
-- name: Install Filebeat
-  hosts: dfsps, switches
-  tags: filebeat
-  roles:
-    - { role: filebeat, become: yes, mgmt_host: '{{ hostvars.mgmt1.ec2_facts.public_dns_name }}' }
-
-- name: Install Curator
-  hosts: mgmt
-  tags: curator
-  roles:
-    - { role: curator, become: yes, mgmt_host: '{{ hostvars.mgmt1.ec2_facts.public_dns_name }}' }
+#- name:  Install Account and User Data
+#  hosts: mgmt
+#  tags: request
+#  roles:
+#    - role: request_data
+#      switch_host: '{{ hostvars.switch1.ansible_host }}'
+#
+#- name:  Install ELK stack
+#  hosts: mgmt
+#  tags: elk
+#  roles:
+#    - { role: elk, become: yes, mgmt_host: '{{ hostvars.mgmt1.ec2_facts.public_dns_name }}' }
+#
+#- name: Install Filebeat
+#  hosts: dfsps, switches
+#  tags: filebeat
+#  roles:
+#    - { role: filebeat, become: yes, mgmt_host: '{{ hostvars.mgmt1.ec2_facts.public_dns_name }}' }
+#
+#- name: Install Curator
+#  hosts: mgmt
+#  tags: curator
+#  roles:
+#    - { role: curator, become: yes, mgmt_host: '{{ hostvars.mgmt1.ec2_facts.public_dns_name }}' }
 
 - name: Remove temporary artifact files
   hosts: localhost
