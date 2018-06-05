@@ -64,7 +64,7 @@ ckms_pass: central_kms
 #DFSP configuration
 dfsp1_peer: dfsp2
 dfsp2_peer: dfsp1
-remote_switch: interop-switch.oss.live
+remote_switch: test-interop-switch.mojaloop.live
 
 # Vagrantfile network setup (for local install only)
 vagrant_net_type: public_network #public_network or private_network
