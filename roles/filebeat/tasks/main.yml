@@ -12,7 +12,8 @@
 
     - name: Add Filebeat repo
       apt_repository:
-        repo: deb https://artifacts.elastic.co/packages/5.x/apt stable main
+        repo: deb https://artifacts.elastic.co/packages/6.x/apt stable main
+        #repo: deb https://artifacts.elastic.co/packages/5.x/apt stable main
         state: present
         update_cache: yes
 
@@ -31,11 +32,18 @@
         path: /etc/filebeat/filebeat.yml
         regexp: '^  env: dfsp1-performance-test'
         replace: '  env: {{ inventory_hostname }}-{{ name_tag }}'
-
+    
+    #For sending to elasticsearch instead of logstash.  Comment out if using logstash
     - replace:
         path: /etc/filebeat/filebeat.yml
-        regexp: '^  hosts: \["54.71.228.163:5043"\]'
-        replace: '  hosts: ["{{ mgmt_host }}:5043"]'
+        regexp: '^  hosts: \["localhost:9200"\]'
+        replace: '  hosts: ["{{ mgmt_host }}:9200"]'
+    
+    #For Logstash configuration    
+    # - replace:
+    #     path: /etc/filebeat/filebeat.yml
+    #     regexp: '^  hosts: \["54.71.228.163:5043"\]'
+    #     replace: '  hosts: ["{{ mgmt_host }}:5043"]'
 
     - name: Restart Filebeat
       service:
