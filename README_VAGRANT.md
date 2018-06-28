@@ -121,7 +121,6 @@ Optional modules available:
 - Curator:  Used to managed indexes in Elasticsearch for memory and disk space management.
   usage: Currently, this modules have been commented out in the create-local.yml ansible playbook to reduce the memory footprint.
 
-The section [in this video](https://www.dropbox.com/home/Level%20One%20OSS%20Team%20Share/Phase%20One%20Wrap-up/Demo%20Folder?preview=ModusBox+Demo.mp4) starting at 00:10 and ending at 8:43 provides a brief overview of the Usage and the components involved.
 
 ## Configuration
 
