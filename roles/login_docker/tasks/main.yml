@@ -1,6 +1,6 @@
 - name: Docker login to JFrog
   docker_login:
-    registry: "modusbox-level1-docker.jfrog.io"
+    registry: "modusbox-level1-docker.jfrog.io/v2"
     username: "{{ mule_repo_user }}"
     password: "{{ mule_repo_pass }}"
     reauthorize: yes
@@ -8,7 +8,7 @@
 
 - name: Docker login to JFrog Release
   docker_login:
-    registry: "modusbox-level1-docker-release.jfrog.io"
+    registry: "modusbox-level1-docker-release.jfrog.io/v2"
     username: "{{ mule_repo_user }}"
     password: "{{ mule_repo_pass }}"
     reauthorize: yes

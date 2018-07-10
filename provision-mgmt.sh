@@ -7,6 +7,8 @@ sudo apt-add-repository -y ppa:ansible/ansible
 sudo apt-get update
 sudo apt-get -y upgrade ansible
 
+sudo apt-get -y install git
+
 # Create RSA key
 # run ssh-keygen -t rsa
 #rm -f /home/vagrant/.ssh/id_rsa

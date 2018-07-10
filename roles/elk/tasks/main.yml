@@ -28,7 +28,7 @@
       lineinfile:
         path: /etc/elasticsearch/elasticsearch.yml
         insertafter: '^#network.host: 192.168.0.1'
-        line: 'network.host: [_eth0_,_local_]'
+        line: 'network.host: 0.0.0.0'
 
 # Do more research on this...looks like log4j is setup.
 #    - copy:
@@ -83,7 +83,7 @@
         state:  restarted
 
     - name:  Add Mojaloop index to Kibana
-      shell: "curl -XPOST \"http://localhost:9200/_template/l1p_template\" -H 'Content-Type: application/json' -d'
+      shell: "curl -XPOST 'http://localhost:9200/_template/l1p_template' -H 'Content-Type: application/json' -d'
              {
                \"template\": [
                  \"l1p_index*\"
@@ -261,7 +261,7 @@
     - name:  Install workaround for the awesome print bug
       become: yes
       git:
-        repo: 'git://github.com/awesome-print/awesome_print.git'
+        repo: 'https://github.com/awesome-print/awesome_print.git'
         dest: /root/awesome_print
 
     - shell: cp -r /root/awesome_print/lib/awesome_print/* /usr/share/logstash/vendor/bundle/jruby/1.9/gems/awesome_print-1.8.0/lib/awesome_print
